@@ -2,13 +2,13 @@
     <div id="menu">
         <div class="boxes">
             <div class="box red"></div>
-            <div class="box green"></div>
+            <div class="box yellow"></div>
             <div class="box red"></div>
-            <div class="box green"></div>
+            <div class="box yellow"></div>
             <div class="box red"></div>
-            <div class="box green"></div>
+            <div class="box yellow"></div>
             <div class="box red"></div>
-            <div class="box green"></div>
+            <div class="box yellow"></div>
         </div>
 
         <div class="list content">
@@ -47,24 +47,13 @@
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-import {mapState, mapActions} from 'vuex'
+import {mapState} from 'vuex'
 import {} from 'vue'
 export default {
     name: 'Menu',
-    components: {
-
-    },
-    data() {
-        return {
-            
-        }
-    },
     computed: {
         ...mapState(['menu'])
     },
-
-
 }
 </script>
 
@@ -97,7 +86,7 @@ export default {
     background-color: hsl(348, 100%, 61%);
     margin-bottom: 0 !important;
 }
-.green{
+.yellow{
     background-color: hsl(48, 100%, 67%); 
     margin-bottom: 0 !important;
 }
