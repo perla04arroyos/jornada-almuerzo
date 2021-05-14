@@ -48,7 +48,7 @@
 
 <script>
 import {mapState} from 'vuex'
-import {} from 'vue'
+
 export default {
     name: 'Menu',
     computed: {

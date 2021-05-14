@@ -84,9 +84,6 @@ export default createStore({
         let index = state.stock.findIndex(ingredient => ingredient.name == payload[i].name)
         state.stock[index].quantity -= payload[i].quantity
       }
-
-      //let index = state.stock.findIndex(ingredient => ingredient.name == payload.name)
-      //state.stock[index].quantity -= payload.quantity
     },
     addCooking(state, payload){
       state.cooking.push(payload)
@@ -142,18 +139,11 @@ export default createStore({
         if(data.quantitySold > 0){
           commit('addShoping', { name: ingredient.name, quantity: data.quantitySold })
           commit('increaseStock', { name: ingredient.name, quantity: data.quantitySold })  
-        }
-        
+        }      
       } catch (error) {
         console.log(error)
       }
-    },
-    addShoping({ commit }, ingredient){
-      commit('addShoping', ingredient)
-    },
-    increaseStock({ commit }, ingredient){
-      commit('increaseStock', ingredient)
-    },
+    }
   },
   modules: {
   }

@@ -1,65 +1,61 @@
 <template>
-  <!--<p class="subtitle">
-    Jornada de Almuerzo ¡<strong>gratis</strong>!
-  </p>-->
-<div class="container is-fluid">
-  <div class="columns">
+  <div class="container is-fluid">
+    <div class="columns">
 
-    <div class="column is-4">
-      <Table :title="'Stock'" :array="stock"/>   
-    </div>
+      <div class="column is-4">
+        <List :title="'Stock'" :array="stock"/>   
+      </div>
 
-    <div class="column is-4">
-
-      <div>
-          <div class="field is-grouped is-grouped-centered">
-            <!--<p class="control">
-              <input 
-                class="input is-warning is-rounded" 
-                type="number" 
-                placeholder="Número de platillos" 
-                v-model.number="orders"
-              >  
-            </p>-->
-            <p class="control">
-              <button 
-                class="button is-danger is-rounded" 
-                :disabled="enableBtn"
-                @click.prevent="order"
-              >
-                Order
-              </button>
-            </p>
+      <div class="column is-4">
+        <div>
+            <div class="field is-grouped is-grouped-centered">
+              <p class="control">
+                <input 
+                  class="input is-warning is-rounded" 
+                  type="number" 
+                  placeholder="Número de platillos" 
+                  v-model.number="orders"
+                >  
+              </p>
+              <p class="control">
+                <button 
+                  class="button is-danger is-rounded" 
+                  :disabled="enableBtn"
+                  @click.prevent="order"
+                >
+                  Order
+                </button>
+              </p>
+            </div>
           </div>
-        </div>
-        <Menu />
-        <Cocina />
-    </div>      
-    
-    <div class="column is-4">
-      <Table :title="'shoping'" :array="shoping"/>   
-        
+          <Menu />
+          <Cocina />
+      </div>      
+      
+      <div class="column is-4">
+        <List :title="'shoping'" :array="shoping"/>       
+      </div>
     </div>
-  </div>
-</div>     
+  </div>     
 </template>
 
 <script>
 import Menu from './components/Menu.vue'
 import Cocina from './components/Cocina.vue'
-import Table from './components/Table.vue'
-
+import List from './components/List.vue'
 
 import {mapState, mapActions} from 'vuex'
 
 export default {
   name: 'App',
   components: {
-    Menu, Cocina, Table
+    Menu, Cocina, List
   },
   data() {
     return {
-      orders: 1
+      orders: 1,
+      contAvailableIngredients: 0,
+      interval: null
     }
   },
   computed: {
@@ -72,58 +68,51 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setKitchen', 'decreaseStock', 'addCooking','deleteKitchen','deleteCooking','addHistory', 'buyIngredients','addShoping','increaseStock']),
+    ...mapActions(['setKitchen', 'decreaseStock', 'addCooking','deleteKitchen','deleteCooking','addHistory', 'buyIngredients']),
+    watch(){
+      this.interval = setInterval(() => {
+        this.prepare()
+      }, 3000)
+    },
     order(){
-      //for (let i = 0; i < this.orders; i++) {
+      for (let i = 0; i < this.orders; i++) {
         let dishIndex = Math.floor(Math.random() * this.menu.length)
-        let dish_ingredients = this.menu[dishIndex].ingredients
         this.setKitchen(dishIndex)
+      }
+    },
+    prepare(){
+      for(let i in this.kitchen){
+        const dishIndex = this.kitchen[i]
+        const dish_ingredients = this.menu[dishIndex].ingredients
         
-        let cont = 0
         for(let j in dish_ingredients){ 
-          let dish_ingredient = dish_ingredients[j]        
-          let inventary_ingredient = this.stock.find(ingredient => ingredient.name == dish_ingredient.name)   
+          const dish_ingredient = dish_ingredients[j]        
+          const inventary_ingredient = this.stock.find(ingredient => ingredient.name == dish_ingredient.name)   
 
           if(inventary_ingredient.quantity < dish_ingredient.quantity){
-            this.buy({name: dish_ingredient.name, quantity: dish_ingredient.quantity})
-            cont++
+            this.buyIngredients({name: dish_ingredient.name, quantity: dish_ingredient.quantity}) 
           }else{
-            cont++
+            this.contAvailableIngredients++
           }
-          //this.decreaseStock(dish_ingredient)        
         }
 
-        if(dish_ingredients.length == cont){
+        if(dish_ingredients.length == this.contAvailableIngredients){
           this.addCooking(dishIndex)    
           this.decreaseStock(dish_ingredients)      
           setTimeout(() => this.deleteKitchen(dishIndex), 900)
           setTimeout(() => this.deleteCooking(dishIndex), 1100)
-          setTimeout(() => this.addHistory(dishIndex), 1200)
+          setTimeout(() => this.addHistory(dishIndex), 1200)    
         }
-      //}
-    },
-    async buy(ingredient){ 
-        try {
-          const res = await fetch(`https://cors-anywhere.herokuapp.com/https://recruitment.alegra.com/api/farmers-market/buy?ingredient=${ingredient.name}`)
-          const data = await res.json();
-
-          console.log(data.quantitySold)
-          if(data.quantitySold > 0){
-            this.addShoping({ name: ingredient.name, quantity: data.quantitySold })
-            this.increaseStock({ name: ingredient.name, quantity: data.quantitySold })
-          }
-        } catch (error) {
-          console.log(error)
-        }
-
-        /*const index = this.stock.findIndex(ingredient_inventary => ingredient_inventary.name == ingredient.name)       
-        if(this.stock[index].quantity < ingredient.quantity){
-          //this.buy(ingredient)
-          console.log("no cocinar")
-        }*/
+        this.contAvailableIngredients = 0
+      }
     }
+  },
+  beforeUnmount () {
+    clearInterval(this.interval)
+  },
+  created () {
+    this.watch()
   }
-
 }
 </script>
 
@@ -135,5 +124,4 @@ export default {
   text-align: center;
   margin-top: 20px;
 }
-
 </style>

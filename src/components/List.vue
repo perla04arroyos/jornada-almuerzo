@@ -20,10 +20,8 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
-
 export default {
-    name: 'Table',
+    name: 'List',
     props: {
         title: String, array: Array
     }
